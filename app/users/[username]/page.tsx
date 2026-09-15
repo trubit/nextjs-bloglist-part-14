@@ -1,23 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getUser, getUserBlogs } from "../../lib/users";
+import { getUserWithBlogs } from "../../lib/users";
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ username: string }>;
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function UserPage({ params }: Props) {
-  const { id } = await params;
-  const userId = Number(id);
-  const user = await getUser(userId);
+  const { username } = await params;
+  const user = await getUserWithBlogs(username);
 
   if (!user) {
     notFound();
   }
-
-  const blogs = await getUserBlogs(userId);
 
   return (
     <div>
@@ -25,7 +22,7 @@ export default async function UserPage({ params }: Props) {
       <p>username: {user.username}</p>
       <h3>added blogs</h3>
       <ul>
-        {blogs.map((blog) => (
+        {user.blogs.map((blog) => (
           <li key={blog.id}>
             <Link href={`/blogs/${blog.id}`}>{blog.title}</Link>
           </li>
