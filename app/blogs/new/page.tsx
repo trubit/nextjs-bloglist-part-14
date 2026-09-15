@@ -9,7 +9,7 @@ export default function NewBlogPage() {
     const author = formData.get("author") as string;
     const url = formData.get("url") as string;
 
-    addBlog({ title, author, url });
+    await addBlog({ title, author, url });
 
     redirect("/blogs");
   }

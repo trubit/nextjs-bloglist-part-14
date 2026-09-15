@@ -1,14 +1,15 @@
-import { getBlogs, likeBlog } from "../../lib/blogs";
+import { getBlog, likeBlog } from "../../lib/blogs";
 import { notFound, redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{ id: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function BlogPage({ params }: Props) {
   const { id } = await params;
-  const blogs = getBlogs();
-  const blog = blogs.find((b) => b.id === Number(id));
+  const blog = await getBlog(Number(id));
 
   if (!blog) {
     notFound();
@@ -18,7 +19,7 @@ export default async function BlogPage({ params }: Props) {
     "use server";
 
     const blogId = Number(formData.get("id"));
-    likeBlog(blogId);
+    await likeBlog(blogId);
     redirect(`/blogs/${blogId}`);
   }
 

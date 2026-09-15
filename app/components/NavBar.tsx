@@ -13,6 +13,9 @@ const NavBar = () => {
         home
       </Link>
       <Link href="/blogs">blogs</Link>
+      <Link href="/users" style={{ marginLeft: "1rem" }}>
+        users
+      </Link>
     </nav>
   );
 };

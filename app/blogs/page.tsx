@@ -1,17 +1,21 @@
 import Link from "next/link";
-import { getBlogs } from "../lib/blogs";
+import { getBlogs, type Blog } from "../lib/blogs";
 import { redirect } from "next/navigation";
 
 type Props = {
   searchParams: Promise<{ filter?: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function BlogsPage({ searchParams }: Props) {
   const { filter = "" } = await searchParams;
 
-  const blogs = getBlogs()
-    .filter((blog) => blog.title.toLowerCase().includes(filter.toLowerCase()))
-    .toSorted((a, b) => b.likes - a.likes);
+  const blogs: Blog[] = (await getBlogs())
+    .filter((blog: Blog) =>
+      blog.title.toLowerCase().includes(filter.toLowerCase()),
+    )
+    .toSorted((a: Blog, b: Blog) => b.likes - a.likes);
 
   async function search(formData: FormData) {
     "use server";

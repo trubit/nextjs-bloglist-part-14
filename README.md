@@ -1,3 +1,22 @@
+# Bloglist
+
+## Database setup
+
+Create a Vercel Postgres/Neon database and copy its connection string to `.env.local`:
+
+```env
+DATABASE_URL=postgresql://user:password@host/database?sslmode=require
+```
+
+Then install dependencies, generate and apply the Drizzle migration, and seed the initial blogs:
+
+```bash
+npm install
+npm run db:generate
+npm run db:migrate
+npm run db:seed
+```
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
