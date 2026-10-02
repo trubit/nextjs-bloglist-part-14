@@ -1,0 +1,64 @@
+name: End-to-End Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: bloglist_test
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d bloglist_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Set up environment file
+        run: |
+          printf 'DATABASE_URL=%s\n' "$DATABASE_URL" > .env.test
+          printf 'NEXTAUTH_SECRET=%s\n' "$NEXTAUTH_SECRET" >> .env.test
+          printf 'NEXTAUTH_URL=%s\n' "$NEXTAUTH_URL" >> .env.test
+          printf 'NODE_ENV=test\n' >> .env.test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/bloglist_test
+          NEXTAUTH_SECRET: github-actions-test-secret
+          NEXTAUTH_URL: http://127.0.0.1:3000
+
+      - name: Run database migrations
+        run: npx drizzle-kit push
+        env:
+          NODE_ENV: test
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

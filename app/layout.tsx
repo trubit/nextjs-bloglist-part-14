@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import "./globals.css";
+import AuthBootstrap from "./components/AuthBootstrap";
 import NavBar from "./components/NavBar";
+import NotificationProvider from "./components/NotificationProvider";
 
 export const metadata: Metadata = {
   title: "Bloglist",
@@ -13,9 +16,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <NavBar />
-        <main style={{ padding: "0 1rem" }}>{children}</main>
+      <body className="min-h-screen bg-stone-50 text-stone-900 antialiased">
+        <NotificationProvider>
+          <AuthBootstrap />
+          <NavBar />
+          <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+            {children}
+          </main>
+        </NotificationProvider>
       </body>
     </html>
   );

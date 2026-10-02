@@ -1,38 +1,30 @@
 import { redirect } from "next/navigation";
-import { addBlog } from "../../lib/blogs";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../../auth";
+import Link from "next/link";
+import NewBlogForm from "./NewBlogForm";
 
-export default function NewBlogPage() {
-  async function createBlog(formData: FormData) {
-    "use server";
-
-    const title = formData.get("title") as string;
-    const author = formData.get("author") as string;
-    const url = formData.get("url") as string;
-
-    await addBlog({ title, author, url });
-
-    redirect("/blogs");
-  }
+export default async function NewBlogPage() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) redirect("/login?callbackUrl=%2Fblogs%2Fnew");
 
   return (
-    <div>
-      <h2>create a new blog</h2>
-
-      <form action={createBlog}>
-        <div>
-          title
-          <input name="title" required />
-        </div>
-        <div>
-          author
-          <input name="author" />
-        </div>
-        <div>
-          url
-          <input name="url" required />
-        </div>
-        <button type="submit">create</button>
-      </form>
+    <div className="mx-auto max-w-2xl">
+      <Link
+        href="/blogs"
+        className="text-sm font-semibold text-emerald-800 hover:text-emerald-950"
+      >
+        ← Back to blogs
+      </Link>
+      <div className="mb-7 mt-6 border-b border-stone-200 pb-5">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-800">
+          Share something worth reading
+        </p>
+        <h1 className="text-3xl font-bold tracking-tight text-stone-900">
+          Add a blog
+        </h1>
+      </div>
+      <NewBlogForm />
     </div>
   );
 }

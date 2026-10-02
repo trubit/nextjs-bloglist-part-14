@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+import postgres from "postgres";
+import { drizzle } from "drizzle-orm/postgres-js";
 import { blogs } from "./schema";
 
 dotenv.config({ path: ".env.local" });
@@ -11,7 +11,8 @@ if (!databaseUrl) {
   throw new Error("DATABASE_URL is not set");
 }
 
-const db = drizzle(neon(databaseUrl));
+const client = postgres(databaseUrl);
+const db = drizzle(client);
 
 async function main() {
   await db.insert(blogs).values([
@@ -38,7 +39,9 @@ async function main() {
   console.log("Seeded blogs");
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+main()
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  })
+  .finally(() => client.end());

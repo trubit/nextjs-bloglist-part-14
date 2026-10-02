@@ -6,6 +6,8 @@ Create a Vercel Postgres/Neon database and copy its connection string to `.env.l
 
 ```env
 DATABASE_URL=postgresql://user:password@host/database?sslmode=require
+NEXTAUTH_SECRET=replace-with-a-long-random-secret
+NEXTAUTH_URL=http://localhost:3000
 ```
 
 Then install dependencies, generate and apply the Drizzle migration, and seed the initial blogs:
@@ -16,6 +18,12 @@ npm run db:generate
 npm run db:migrate
 npm run db:seed
 ```
+
+The migration adds `users.password_hash`. Apply it before using registration or login. New accounts are created at `/register`; users created before password authentication need a password hash set before they can log in. Set `NEXTAUTH_SECRET` to a long, random value in each environment.
+
+## GitHub Actions tests
+
+The Playwright workflow starts an isolated PostgreSQL service for the run. It does not require repository database secrets; the test suite clears its own temporary database before each test.
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
