@@ -54,11 +54,18 @@ jobs:
           NODE_ENV: test
 
       - name: Run Playwright tests
-        run: npx playwright test
+        run: |
+          mkdir -p test-results
+          npx playwright test --reporter=json > test-results/report.json
+
+      - name: Summarize Playwright results
+        if: always()
+        run: node tests/summarize-playwright.mjs
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: playwright-results
+          path: test-results/
+          if-no-files-found: ignore
           retention-days: 30
