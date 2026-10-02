@@ -54,9 +54,9 @@ jobs:
           NODE_ENV: test
 
       - name: Run Playwright tests
-        run: |
-          mkdir -p test-results
-          npx playwright test --reporter=json > test-results/report.json
+        run: npx playwright test --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: test-results/report.json
 
       - name: Summarize Playwright results
         if: always()
